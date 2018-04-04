@@ -1,0 +1,19 @@
+get_AF <- function(rp,z,threshold,lambda,Ne_hist,GPD,slr) {
+  
+  q <- 1/rp
+  
+  # The height of the historical flood with frequency q
+  hist_height <- round(z[which.min(abs(Ne_hist-q))],2)
+  
+  # Now find the frequency of this height on the shifted curve
+  qqq <- matrix(NaN, nrow=length(GPD[,2]), ncol=length(z))
+  for(iii in 1:length(GPD[,2]) ){
+    qqq[iii,] <- GPDNExceed(z-slr-threshold,lambda,-threshold,GPD[iii,2],GPD[iii,1])
+  }
+  Nfuture  <- apply(qqq,2,mean,na.rm=T)
+
+  mi <- which.min( abs(z-hist_height) )
+  af = Nfuture[mi]/q
+  
+  return ( list(AF=af,HistHeight=hist_height)  )
+}
